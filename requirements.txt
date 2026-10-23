@@ -1,10 +1,2 @@
 fastapi
 uvicorn[standard]
-python-telegram-bot==20.7
-sqlalchemy
-asyncpg
-aiohttp
-python-dotenv
-jinja2
-requests
-aiosqlite
