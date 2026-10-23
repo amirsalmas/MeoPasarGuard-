@@ -25,9 +25,14 @@
             <button onclick="toggleMusic()" style="background:none; border:none; color:#d4af37; cursor:pointer; font-size:20px;">⏸️</button>
         </div>
     </div>
-    <audio id="bg-music" autoplay></audio>
+
+    <audio id="bg-music" autoplay loop></audio>
     <script>
-        const playlist = ["/static/music-panel.mp3", "/static/3_Am_Walk_Daniel.mp3"];
+        // اینجا لینک مستقیم آهنگ‌های آنلاین رو گذاشتم
+        const playlist = [
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // آهنگ اول
+            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"  // آهنگ دوم
+        ];
         let current = 0;
         const player = document.getElementById('bg-music');
         player.src = playlist[current];
