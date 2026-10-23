@@ -1,47 +1,65 @@
+import os
+from fastapi import FastAPI
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles  # <--- اضافه شد
+import uvicorn
+
+app = FastAPI()
+
+# این خط باعث میشه پنل بتونه آهنگ‌ها رو از پوشه static بخونه
+app.mount("/static", StaticFiles(directory="static"), name="static")  # <--- اضافه شد
+
+HTML_CONTENT = """
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Meo PasarGuard | پنل هخامنشی</title>
+    <title>Meo PasarGuard</title>
     <style>
-        body { background-color: #0f0f13; color: #d4af37; font-family: Tahoma; text-align: center; padding-top: 40px; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Persepolis_-_The_Gate_of_All_Nations.jpg/1200px-Persepolis_-_The_Gate_of_All_Nations.jpg'); background-size: cover; background-blend-mode: overlay; margin: 0; height: 100vh; }
+        body { background-color: #0f0f13; color: #d4af37; font-family: Tahoma; text-align: center; padding-top: 50px; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Persepolis_-_The_Gate_of_All_Nations.jpg/1200px-Persepolis_-_The_Gate_of_All_Nations.jpg'); background-size: cover; background-blend-mode: overlay; margin: 0; height: 100vh; }
         .logo { width: 120px; height: 120px; border: 2px solid #d4af37; border-radius: 50%; margin: 0 auto 20px; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Faravahar_silver_coin.png/200px-Faravahar_silver_coin.png'); background-size: contain; background-repeat: no-repeat; background-position: center; background-color: #1a1a2e; box-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
-        h1 { color: #d4af37; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6); margin-bottom: 10px; }
-        .box { background: rgba(26, 26, 46, 0.9); border: 1px solid #d4af37; padding: 30px; border-radius: 15px; width: 80%; max-width: 500px; margin: 30px auto; box-shadow: 0 0 30px rgba(0, 0, 0, 0.8); }
-        .btn { background-color: #d4af37; color: #1a1a2e; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 15px; transition: 0.3s; }
-        .btn:hover { background-color: #b8962e; transform: scale(1.05); }
-        .music-player { margin-top: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; color: #888; font-size: 14px; }
+        h1 { color: #d4af37; text-shadow: 0 0 15px rgba(212, 175, 55, 0.6); }
+        .box { background: rgba(26, 26, 46, 0.9); border: 1px solid #d4af37; padding: 30px; border-radius: 15px; width: 80%; max-width: 500px; margin: 30px auto; }
+        .btn { background-color: #d4af37; color: #1a1a2e; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 15px; cursor: pointer; border: none; }
+        .music-player { margin-top: 20px; color: #888; font-size: 14px; }
     </style>
 </head>
 <body>
     <div class="logo"></div>
     <h1>پنل میو پاسارگارد</h1>
     <div class="box">
-        <p>به پنل مدیریت و فروش کانفیگ خوش آمدید.</p>
-        <p>برای دریافت کانفیگ تست یا خرید، به ربات تلگرام ما مراجعه کنید.</p>
-        <a href="https://t.me/meov2ray" target="_blank" class="btn">ورود به کانال تلگرام</a>
+        <p>به پنل مدیریت خوش آمدید. (نسخه فوق سریع)</p>
+        <button onclick="getConfig()" class="btn">دریافت کانفیگ تست</button>
         <div class="music-player">
             <span>🎵 در حال پخش موزیک...</span>
             <button onclick="toggleMusic()" style="background:none; border:none; color:#d4af37; cursor:pointer; font-size:20px;">⏸️</button>
         </div>
     </div>
 
-    <audio id="bg-music" autoplay loop></audio>
+    <!-- این خط آهنگ رو از پوشه static می‌خونه -->
+    <audio id="bg-music" autoplay loop>
+        <source src="/static/music-panel.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        // اینجا لینک مستقیم آهنگ‌های آنلاین رو گذاشتم
-        const playlist = [
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3", // آهنگ اول
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"  // آهنگ دوم
-        ];
-        let current = 0;
+        function getConfig() {
+            alert("این یک کانفیگ تست است:\\n\\nvless://demo-user@meo.server:443?type=ws#Meo-Test");
+        }
         const player = document.getElementById('bg-music');
-        player.src = playlist[current];
-        player.addEventListener('ended', () => {
-            current = (current + 1) % playlist.length;
-            player.src = playlist[current];
-            player.play();
-        });
         function toggleMusic() { if (player.paused) { player.play(); } else { player.pause(); } }
     </script>
 </body>
 </html>
+"""
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    return HTML_CONTENT
+
+@app.get("/api/status")
+async def status():
+    return {"status": "online", "panel": "Meo PasarGuard"}
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
